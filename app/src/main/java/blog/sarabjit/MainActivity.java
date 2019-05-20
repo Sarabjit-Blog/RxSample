@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String SAY_HELLO = "Hello From Sarab";
     private Observable<String> myObservable;
     private Observer<String> myObserver;
+    private Disposable mDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
         myObserver = new Observer<String>() {
             @Override
             public void onSubscribe(Disposable d) {
-                Log.d(TAG, "On Disposable");
+                mDisposable = d;
+                Log.d(TAG, "On Subscribe");
             }
 
             @Override
@@ -48,5 +50,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         myObservable.subscribe(myObserver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDisposable.dispose();
     }
 }
