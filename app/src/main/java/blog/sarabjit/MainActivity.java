@@ -7,33 +7,25 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "RxSample";
     private static final String SAY_HELLO = "Hello From Sarab";
     private Observable<String> myObservable;
-    private Observer<String> myObserver;
-    private Disposable mDisposable;
+    private DisposableObserver<String> mDisposableObserver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         myObservable = Observable.just(SAY_HELLO);
         myObservable.subscribeOn(AndroidSchedulers.mainThread());
-        myObserver = new Observer<String>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                mDisposable = d;
-                Log.d(TAG, "On Subscribe");
-            }
-
+        mDisposableObserver = new DisposableObserver<String>() {
             @Override
             public void onNext(String s) {
-                Log.d(TAG, "On Next");
+                Log.d(TAG, "OnNext");
                 Toast t = Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG);
                 t.setGravity(Gravity.CENTER, 0, 0);
                 t.show();
@@ -41,20 +33,21 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable e) {
-                Log.d(TAG, "On Error");
+                Log.d(TAG, "OnError");
             }
 
             @Override
             public void onComplete() {
-                Log.d(TAG, "On Complete");
+                Log.d(TAG, "OnComplete");
+
             }
         };
-        myObservable.subscribe(myObserver);
+        myObservable.subscribe(mDisposableObserver);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDisposable.dispose();
+        mDisposableObserver.dispose();
     }
 }
